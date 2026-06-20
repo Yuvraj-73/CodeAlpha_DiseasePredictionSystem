@@ -1,7 +1,8 @@
 import streamlit as st
 import pickle
 import pandas as pd
-
+st.title("Version2 test")
+st.sidebar.header("Model Performance")
 
 # =========================================
 # LOAD MODELS
@@ -72,18 +73,33 @@ if disease == "Diabetes":
 
         input_data = diabetes_scaler.transform(input_data)
         prediction = diabetes_model.predict(input_data)
+        probability=diabetes_model.predict_proba(input_data)
+        risk=probability[0][1]*100
+        if risk<30:
+            st.success("Low risk")
+        elif risk<70:
+            st.warning("Moderate risk")
+        else:
+            st.error("High risk")
 
         if prediction[0] == 1:
-            st.error("Diabetes Detected")
+            st.error(f"Diabetes risk: {risk:.2f}%")
+            st.progress(float(risk/100))
         else:
             st.success("No Diabetes Detected")
-
+st.info(
+"""
+Diabetes is a chronic condition
+where blood glucose levels become
+too high.
+"""
+)
 
 # =========================================
 # HEART DISEASE PREDICTION
 # =========================================
 
-elif disease == "Heart Disease":
+if disease == "Heart Disease":
 
     st.header("Heart Disease Prediction")
 
@@ -123,20 +139,26 @@ elif disease == "Heart Disease":
               ca, thal]]
         )
         input_data = heart_scaler.transform(input_data)
+        probability = heart_model.predict_proba(input_data)
+        risk = probability[0][1] * 100
 
         prediction = heart_model.predict(input_data)
 
         if prediction[0] == 1:
-            st.error("Heart Disease Detected")
+            st.error(f"Heart disease Risk: {risk:.2f}%")
+            st.progress(float(risk/100))
         else:
             st.success("No Heart Disease Detected")
+st.info(
+    """Heart disease is a general term for conditions affecting the heart or blood vessels"""
+)
 
 
 # =========================================
 # BREAST CANCER PREDICTION
 # =========================================
 
-elif disease == "Breast Cancer":
+if disease == "Breast Cancer":
 
     st.header("Breast Cancer Prediction")
 
@@ -221,8 +243,14 @@ elif disease == "Breast Cancer":
         )
         input_data = cancer_scaler.transform(input_data)
         prediction = cancer_model.predict(input_data)
+        probability=cancer_model.predict_proba(input_data)
+        risk = probability[0][1] * 100
 
         if prediction[0] == 1:
-            st.error("Breast Cancer Detected")
+            st.error(f"Breast Cancer Risk: {risk:.2f}%")
+            st.progress(float(risk/100))
         else:
             st.success("No Breast Cancer Detected")
+st.info(
+    """Breast cancer is a disease where abnormal cells in the breast tissues multiply uncontrolablly,usually forming tumors."""
+)
