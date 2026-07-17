@@ -3,7 +3,6 @@ import pickle
 import pandas as pd
 st.set_page_config(
     page_title="Medscope",
-    page_title="Med",
     page_icon="logo.png",
     layout="wide"
 )
