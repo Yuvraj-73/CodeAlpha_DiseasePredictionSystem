@@ -1,25 +1,46 @@
 import streamlit as st
 import pickle
 import pandas as pd
-st.title("Version2 test")
-st.sidebar.header("Model Performance")
+st.title("🏥 AI Multi Disease Prediction System")
+st.caption("Machine Learning Based Clinical Decision Support Tool")
+st.warning(
+    "⚠️ This application is intended for educational purposes only and should not replace professional medical advice."
+)
+# =========================================
+# LOAD MODELS ONLY ONCE
+# =========================================
 
+@st.cache_resource
+def load_models():
+
+    diabetes_model = pickle.load(open("diabetes_model.pkl", "rb"))
+    heart_model = pickle.load(open("heart_model.pkl", "rb"))
+    cancer_model = pickle.load(open("cancer_model.pkl", "rb"))
+
+    diabetes_scaler = pickle.load(open("diabetes_scaler.pkl", "rb"))
+    heart_scaler = pickle.load(open("heart_scaler.pkl", "rb"))
+    cancer_scaler = pickle.load(open("cancer_scaler.pkl", "rb"))
+
+    return (
+        diabetes_model,
+        heart_model,
+        cancer_model,
+        diabetes_scaler,
+        heart_scaler,
+        cancer_scaler
+    )
 # =========================================
 # LOAD MODELS
 # =========================================
 
-diabetes_model = pickle.load(open("diabetes_model.pkl", "rb"))
-
-heart_model = pickle.load(open("heart_model.pkl", "rb"))
-
-cancer_model = pickle.load(open("cancer_model.pkl", "rb"))
-
-diabetes_scaler = pickle.load(open("diabetes_scaler.pkl", "rb"))
-
-heart_scaler = pickle.load(open("heart_scaler.pkl", "rb"))
-
-cancer_scaler = pickle.load(open("cancer_scaler.pkl", "rb"))
-
+(
+    diabetes_model,
+    heart_model,
+    cancer_model,
+    diabetes_scaler,
+    heart_scaler,
+    cancer_scaler
+) = load_models()
 
 # =========================================
 # PAGE TITLE
@@ -37,12 +58,38 @@ disease = st.sidebar.selectbox(
     ["Diabetes", "Heart Disease", "Breast Cancer"]
 )
 
+st.sidebar.markdown("---")
+st.sidebar.header("📊 Model Information")
 
+if disease == "Diabetes":
+    st.sidebar.metric("Accuracy", "75.32%")
+    st.sidebar.write("**Algorithm:** Logistic Regression")
+    st.sidebar.write("**Dataset:** PIMA Indians")
+    st.sidebar.write("**Features:** 8")
+
+elif disease == "Heart Disease":
+    st.sidebar.metric("Accuracy", "98.36%")
+    st.sidebar.write("**Algorithm:** Random Forest")
+    st.sidebar.write("**Dataset:** UCI Heart Disease")
+    st.sidebar.write("**Features:** 13")
+
+elif disease == "Breast Cancer":
+    st.sidebar.metric("Accuracy", "98.24%")
+    st.sidebar.write("**Algorithm:** Random Forest")
+    st.sidebar.write("**Dataset:** Breast Cancer Wisconsin")
+    st.sidebar.write("**Features:** 30")
 # =========================================
 # DIABETES PREDICTION
 # =========================================
 
 if disease == "Diabetes":
+    st.info(
+    """
+    Diabetes is a chronic condition
+    where blood glucose levels become
+    too high.
+    """
+    )
 
     st.header("Diabetes Prediction")
 
@@ -75,25 +122,7 @@ if disease == "Diabetes":
         prediction = diabetes_model.predict(input_data)
         probability=diabetes_model.predict_proba(input_data)
         risk=probability[0][1]*100
-        if risk<30:
-            st.success("Low risk")
-        elif risk<70:
-            st.warning("Moderate risk")
-        else:
-            st.error("High risk")
-
-        if prediction[0] == 1:
-            st.error(f"Diabetes risk: {risk:.2f}%")
-            st.progress(float(risk/100))
-        else:
-            st.success("No Diabetes Detected")
-st.info(
-"""
-Diabetes is a chronic condition
-where blood glucose levels become
-too high.
-"""
-)
+        
 
 # =========================================
 # HEART DISEASE PREDICTION
@@ -102,6 +131,9 @@ too high.
 if disease == "Heart Disease":
 
     st.header("Heart Disease Prediction")
+    st.info(
+        """Heart disease is a general term for conditions affecting the heart or blood vessels"""
+    )
 
     age = st.number_input("Age")
 
@@ -149,9 +181,7 @@ if disease == "Heart Disease":
             st.progress(float(risk/100))
         else:
             st.success("No Heart Disease Detected")
-st.info(
-    """Heart disease is a general term for conditions affecting the heart or blood vessels"""
-)
+    
 
 
 # =========================================
@@ -161,6 +191,9 @@ st.info(
 if disease == "Breast Cancer":
 
     st.header("Breast Cancer Prediction")
+    st.info(
+        """Breast cancer is a disease where abnormal cells in the breast tissues multiply uncontrolablly,usually forming tumors."""
+    )
 
     radius_mean = st.number_input("Radius Mean")
 
@@ -251,6 +284,4 @@ if disease == "Breast Cancer":
             st.progress(float(risk/100))
         else:
             st.success("No Breast Cancer Detected")
-st.info(
-    """Breast cancer is a disease where abnormal cells in the breast tissues multiply uncontrolablly,usually forming tumors."""
-)
+    
