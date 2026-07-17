@@ -1,6 +1,12 @@
 import streamlit as st
 import pickle
 import pandas as pd
+st.set_page_config(
+    page_title="Medscope",
+    page_title="Med",
+    page_icon="logo.png",
+    layout="wide"
+)
 st.title("🏥 AI Multi Disease Prediction System")
 st.caption("Machine Learning Based Clinical Decision Support Tool")
 st.warning(
