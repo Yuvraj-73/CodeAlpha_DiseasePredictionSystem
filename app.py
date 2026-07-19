@@ -48,13 +48,6 @@ def load_models():
 ) = load_models()
 
 # =========================================
-# PAGE TITLE
-# =========================================
-
-st.title("AI Multi Disease Prediction System")
-
-
-# =========================================
 # SIDEBAR
 # =========================================
 
@@ -127,6 +120,74 @@ if disease == "Diabetes":
         prediction = diabetes_model.predict(input_data)
         probability=diabetes_model.predict_proba(input_data)
         risk=probability[0][1]*100
+        # ----------------------------
+# Risk Level
+# ----------------------------
+
+        if risk < 30:
+            st.success("🟢 Low Risk")
+        elif risk < 70:
+            st.warning("🟡 Moderate Risk")
+        else:
+            st.error("🔴 High Risk")
+
+        # ----------------------------
+        # Prediction
+        # ----------------------------
+
+        if prediction[0] == 1:
+
+            st.error(f"Diabetes Detected")
+
+            st.metric(
+                label="Prediction Probability",
+                value=f"{risk:.2f}%"
+            )
+
+            st.progress(min(risk / 100, 1.0))
+
+        else:
+
+            st.success("No Diabetes Detected")
+
+            st.metric(
+                label="Prediction Probability",
+                value=f"{100-risk:.2f}%"
+            )
+
+            st.progress(min((100-risk)/100,1.0))
+
+# ----------------------------
+# Patient Summary
+# ----------------------------
+
+        st.subheader("Patient Summary")
+
+        summary = pd.DataFrame({
+            "Parameter":[
+                "Pregnancies",
+                "Glucose",
+                "Blood Pressure",
+                "Skin Thickness",
+                "Insulin",
+                "BMI",
+                "Diabetes Pedigree",
+                "Age"
+            ],
+            "Value":[
+                pregnancies,
+                glucose,
+                blood_pressure,
+                skin_thickness,
+                insulin,
+                bmi,
+                diabetes_pedigree,
+                age
+            ]
+        })
+
+        st.dataframe(summary, use_container_width=True)
+        
         
 
 # =========================================
@@ -171,23 +232,107 @@ if disease == "Heart Disease":
 
         input_data = pd.DataFrame(
             [[age, sex, cp, trestbps, chol,
-              fbs, restecg, thalach,
-              exang, oldpeak, slope,
-              ca, thal]]
+            fbs, restecg, thalach,
+            exang, oldpeak, slope,
+            ca, thal]],
+
+            columns=[
+                "age","sex","cp","trestbps","chol",
+                "fbs","restecg","thalach","exang",
+                "oldpeak","slope","ca","thal"
+            ]
         )
+
         input_data = heart_scaler.transform(input_data)
-        probability = heart_model.predict_proba(input_data)
-        risk = probability[0][1] * 100
 
         prediction = heart_model.predict(input_data)
 
-        if prediction[0] == 1:
-            st.error(f"Heart disease Risk: {risk:.2f}%")
-            st.progress(float(risk/100))
-        else:
-            st.success("No Heart Disease Detected")
-    
+        probability = heart_model.predict_proba(input_data)
 
+        risk = probability[0][1] * 100
+
+
+        # ------------------------
+        # Risk Level
+        # ------------------------
+
+        if risk < 30:
+            st.success("🟢 Low Risk")
+
+        elif risk < 70:
+            st.warning("🟡 Moderate Risk")
+
+        else:
+            st.error("🔴 High Risk")
+
+
+        # ------------------------
+        # Prediction
+        # ------------------------
+
+        if prediction[0] == 1:
+
+            st.error("Heart Disease Detected")
+
+            st.metric(
+                "Prediction Probability",
+                f"{risk:.2f}%"
+            )
+
+            st.progress(min(risk/100,1.0))
+
+        else:
+
+            st.success("No Heart Disease Detected")
+
+            st.metric(
+                "Prediction Probability",
+                f"{100-risk:.2f}%"
+            )
+
+            st.progress(min((100-risk)/100,1.0))
+
+
+        # ------------------------
+        # Patient Summary
+        # ------------------------
+
+        st.subheader("Patient Summary")
+
+        summary = pd.DataFrame({
+            "Parameter":[
+                "Age",
+                "Sex",
+                "Chest Pain",
+                "Resting BP",
+                "Cholesterol",
+                "Fasting Blood Sugar",
+                "Rest ECG",
+                "Max Heart Rate",
+                "Exercise Angina",
+                "Old Peak",
+                "Slope",
+                "CA",
+                "Thal"
+            ],
+            "Value":[
+                age,
+                sex,
+                cp,
+                trestbps,
+                chol,
+                fbs,
+                restecg,
+                thalach,
+                exang,
+                oldpeak,
+                slope,
+                ca,
+                thal
+            ]
+        })
+
+        st.dataframe(summary, use_container_width=True)
 
 # =========================================
 # BREAST CANCER PREDICTION
@@ -260,33 +405,149 @@ if disease == "Breast Cancer":
 
     fractal_dimension_worst = st.number_input("Fractal Dimension Worst")
 
-
     if st.button("Predict Breast Cancer"):
 
         input_data = pd.DataFrame(
-            [[radius_mean, texture_mean, perimeter_mean,
-              area_mean, smoothness_mean,
-              compactness_mean, concavity_mean,
-              concave_points_mean, symmetry_mean,
-              fractal_dimension_mean, radius_se,
-              texture_se, perimeter_se, area_se,
-              smoothness_se, compactness_se,
-              concavity_se, concave_points_se,
-              symmetry_se, fractal_dimension_se,
-              radius_worst, texture_worst,
-              perimeter_worst, area_worst,
-              smoothness_worst, compactness_worst,
-              concavity_worst, concave_points_worst,
-              symmetry_worst, fractal_dimension_worst]]
+            [[
+                radius_mean, texture_mean, perimeter_mean,
+                area_mean, smoothness_mean,
+                compactness_mean, concavity_mean,
+                concave_points_mean, symmetry_mean,
+                fractal_dimension_mean, radius_se,
+                texture_se, perimeter_se, area_se,
+                smoothness_se, compactness_se,
+                concavity_se, concave_points_se,
+                symmetry_se, fractal_dimension_se,
+                radius_worst, texture_worst,
+                perimeter_worst, area_worst,
+                smoothness_worst, compactness_worst,
+                concavity_worst, concave_points_worst,
+                symmetry_worst, fractal_dimension_worst
+            ]]
         )
+
         input_data = cancer_scaler.transform(input_data)
+
         prediction = cancer_model.predict(input_data)
-        probability=cancer_model.predict_proba(input_data)
+
+        probability = cancer_model.predict_proba(input_data)
+
         risk = probability[0][1] * 100
 
-        if prediction[0] == 1:
-            st.error(f"Breast Cancer Risk: {risk:.2f}%")
-            st.progress(float(risk/100))
+
+        # ------------------------
+        # Risk Level
+        # ------------------------
+
+        if risk < 30:
+            st.success("🟢 Low Risk")
+
+        elif risk < 70:
+            st.warning("🟡 Moderate Risk")
+
         else:
+            st.error("🔴 High Risk")
+
+
+        # ------------------------
+        # Prediction
+        # ------------------------
+
+        if prediction[0] == 1:
+
+            st.error("Breast Cancer Detected")
+
+            st.metric(
+                "Prediction Probability",
+                f"{risk:.2f}%"
+            )
+
+            st.progress(min(risk/100,1.0))
+
+        else:
+
             st.success("No Breast Cancer Detected")
-    
+
+            st.metric(
+                "Prediction Probability",
+                f"{100-risk:.2f}%"
+            )
+
+            st.progress(min((100-risk)/100,1.0))
+
+
+        # ------------------------
+        # Patient Summary
+        # ------------------------
+
+        st.subheader("Patient Summary")
+
+        summary = pd.DataFrame({
+            "Parameter":[
+                "Radius Mean",
+                "Texture Mean",
+                "Perimeter Mean",
+                "Area Mean",
+                "Smoothness Mean",
+                "Compactness Mean",
+                "Concavity Mean",
+                "Concave Points Mean",
+                "Symmetry Mean",
+                "Fractal Dimension Mean",
+                "Radius SE",
+                "Texture SE",
+                "Perimeter SE",
+                "Area SE",
+                "Smoothness SE",
+                "Compactness SE",
+                "Concavity SE",
+                "Concave Points SE",
+                "Symmetry SE",
+                "Fractal Dimension SE",
+                "Radius Worst",
+                "Texture Worst",
+                "Perimeter Worst",
+                "Area Worst",
+                "Smoothness Worst",
+                "Compactness Worst",
+                "Concavity Worst",
+                "Concave Points Worst",
+                "Symmetry Worst",
+                "Fractal Dimension Worst"
+            ],
+
+            "Value":[
+                radius_mean,
+                texture_mean,
+                perimeter_mean,
+                area_mean,
+                smoothness_mean,
+                compactness_mean,
+                concavity_mean,
+                concave_points_mean,
+                symmetry_mean,
+                fractal_dimension_mean,
+                radius_se,
+                texture_se,
+                perimeter_se,
+                area_se,
+                smoothness_se,
+                compactness_se,
+                concavity_se,
+                concave_points_se,
+                symmetry_se,
+                fractal_dimension_se,
+                radius_worst,
+                texture_worst,
+                perimeter_worst,
+                area_worst,
+                smoothness_worst,
+                compactness_worst,
+                concavity_worst,
+                concave_points_worst,
+                symmetry_worst,
+                fractal_dimension_worst
+            ]
+        })
+
+        st.dataframe(summary, use_container_width=True)
